@@ -49,7 +49,7 @@ public class Gamepad implements Runnable {
 		}
 	}
 	
-	public void parse(String message){
+	private void parse(String message){
 		String[] cmd = String.split(message, " ");		
 		String commandName = cmd[0];
 		
