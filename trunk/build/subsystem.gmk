@@ -1,0 +1,90 @@
+# Adds to global SUBSYSTEMS list
+#
+SUBSYSTEMS += trikset
+
+# Generate doxygen for the following native sources
+#
+DOXYGEN_INPUT_LIST += \
+    ${TRIKSET_DIR}/src/native/inc/Sensor3d.h 
+
+# Javadoc source path
+TRIKSET_SOURCEPATH += \
+    ${TRIKSET_DIR}/src/classes 
+
+TRIKSET_PACKAGES += \
+	com.trikset.control 
+
+JAVADOC_ALL_SOURCEPATH += $(TRIKSET_SOURCEPATH)
+JAVADOC_ALL_PACKAGES +=  $(TRIKSET_PACKAGES)
+
+
+# Java files for the ( trikset ) module
+#
+TRIKSET_SHARE_JAVA_DIR = $(TRIKSET_DIR)/src/classes
+
+# Public API classes
+#
+MODULE_TRIKSET_API_JAVA_FILES = \
+    ${TRIKSET_SHARE_JAVA_DIR}/com/trikset/control/Sensor3d.java \
+    ${TRIKSET_SHARE_JAVA_DIR}/com/trikset/control/I2cCommunicator.java \
+    ${TRIKSET_SHARE_JAVA_DIR}/com/trikset/control/Encoder.java \
+    ${TRIKSET_SHARE_JAVA_DIR}/com/trikset/control/PowerMotor.java \
+    ${TRIKSET_SHARE_JAVA_DIR}/com/trikset/control/AnalogSensor.java \
+    ${TRIKSET_SHARE_JAVA_DIR}/com/trikset/control/Battery.java \
+    ${TRIKSET_SHARE_JAVA_DIR}/com/trikset/control/ServoMotor.java \
+    ${TRIKSET_SHARE_JAVA_DIR}/com/trikset/control/Gamepad.java \
+    ${TRIKSET_SHARE_JAVA_DIR}/com/trikset/control/IGamepad.java \
+    ${TRIKSET_SHARE_JAVA_DIR}/com/trikset/control/DigitalSensor.java \
+    ${TRIKSET_SHARE_JAVA_DIR}/com/trikset/control/Led.java \
+    ${TRIKSET_SHARE_JAVA_DIR}/java/lang/String.java
+	
+# Paths for native code
+#
+vpath % $(TRIKSET_DIR)/src/native
+
+SUBSYSTEM_TRIKSET_NATIVE_FILES += \
+	Sensor3d.c \
+	I2cCommunicator.c \
+	DigitalSensor.c \
+	Led.c \
+	ServoMotor.c
+
+SUBSYSTEM_TRIKSET_EXTRA_INCLUDES += \
+   -I$(TRIKSET_DIR)/src/native/inc
+
+# Determines what option we have made and assigns it to the
+# variable that the global makefile recognizes.
+#
+SUBSYSTEM_TRIKSET_JAVA_FILES += \
+    $(MODULE_TRIKSET_API_JAVA_FILES)
+
+
+# Append trikset source bundle creation to target
+source_bundle:: trikset_source_bundle
+
+# Create trikset source in subdir 'trikset/'
+TRIKSET_SOURCE_OUTPUT_DIR=$(SOURCE_OUTPUT_DIR)/trikset
+
+# Copy and filter trikset source in TRIKSET_SOURCE_OUTPUT_DIR
+#
+trikset_source_bundle:: SOURCE_OUTPUT_DIR
+	@echo " ... trikset source bundle" $(LOG)
+	@$(call re_src_filter,$(TRIKSET_DIR),$(TRIKSET_SOURCE_OUTPUT_DIR),src)
+
+ 
+$(MIDP_CLASSES_ZIP):: $(SUBSYSTEM_TRIKSET_JAVA_FILES)
+	$(appendjavafiles)
+
+JTWI_NATIVE_FILES      += $(SUBSYSTEM_TRIKSET_NATIVE_FILES)
+EXTRA_INCLUDES         += $(SUBSYSTEM_TRIKSET_EXTRA_INCLUDES)
+
+#
+# Remove "-Werror" from $(CFLAGS) for all native files
+# IMPL_NOTE: fix the warnings in the native files
+#
+$(OBJ_DIR)/%.o: $(TRIKSET_DIR)/src/native/%.c
+	@echo " ... $@" $(LOG)
+	@echo +++ $(CC) $(subst ,,$(CFLAGS)) -c $(CC_OUTPUT)$@ `$(call fixcygpath, $<)` $(LOG_ONLY)
+	$(A)$(CC) $(subst ,,$(CFLAGS)) -c $(CC_OUTPUT)$@ `$(call fixcygpath, $<)` $(LOG)
+
+
