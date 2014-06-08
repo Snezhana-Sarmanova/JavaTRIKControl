@@ -19,11 +19,11 @@ public class Car {
 
 	public int currentPower;
 	
-	private String FrontLeftServoMotorName = "/sys/class/pwm/ehrpwm.1:1";
-	private String FrontRightServoMotorName = "/sys/class/pwm/ecap.1";
-	private String BackLeftServoMotorName = "";
-	private String BackRightServoMotorName = "";
-
+	private String FrontLeftServoMotorName = "/sys/class/pwm/ecap.1";
+	private String FrontRightServoMotorName = "/sys/class/pwm/ehrpwm.1:1";
+	private String BackLeftServoMotorName = "/sys/class/pwm/ecap.0";
+	private String BackRightServoMotorName = "/sys/class/pwm/ehrpwm.0:1";
+	
 	public ServoMotor FrontLeftServoMotor;
 	public ServoMotor FrontRightServoMotor;
 	public ServoMotor BackLeftServoMotor;
@@ -37,15 +37,19 @@ public class Car {
 		FrontLeftMotor = new PowerMotor(i2c, FrontLeftMotorName, false);
 		FrontRightMotor = new PowerMotor(i2c, FrontRightMotorName, false);
 		BackLeftMotor = new PowerMotor(i2c, BackLeftMotorName, false);
-		BackRightMotor = new PowerMotor(i2c, BackRightMotorName, false);		
+		BackRightMotor = new PowerMotor(i2c, BackRightMotorName, true);		
 		
 		currentPower = 0;
 		
 		FrontLeftServoMotor = new ServoMotor(1200000, 1800000, 1500000, 0, FrontLeftServoMotorName, 20000000, false);
-		FrontRightServoMotor = new ServoMotor(1200000, 1800000, 1500000, 0, FrontRightServoMotorName, 20000000, true);
-		BackLeftServoMotor = new ServoMotor(1200000, 1800000, 1500000, 0, BackLeftServoMotorName, 20000000, false);
-		BackRightServoMotor = new ServoMotor(1200000, 1800000, 1500000, 0, BackRightServoMotorName, 20000000, true);
-		
+		FrontRightServoMotor = new ServoMotor(1200000, 1800000, 1500000, 0, FrontRightServoMotorName, 20000000, false);
+		BackLeftServoMotor = new ServoMotor(1200000, 1800000, 1500000, 0, FrontLeftServoMotorName, 20000000, false);
+		BackRightServoMotor = new ServoMotor(1200000, 1800000, 1500000, 0, FrontRightServoMotorName, 20000000, false);
+	
+		FrontLeftServoMotor.setPower(0);
+		FrontRightServoMotor.setPower(0);
+		BackLeftServoMotor.setPower(0);
+		BackRightServoMotor.setPower(0);		
 	}
 	
 	public void drive(int power){
@@ -73,8 +77,6 @@ public class Car {
 	public void stopServoMotors(){
 		FrontLeftServoMotor.powerOff();
 		FrontRightServoMotor.powerOff();
-		BackLeftServoMotor.powerOff();
-		BackRightServoMotor.powerOff();
 	}
 
 	public void destroyCar(){
